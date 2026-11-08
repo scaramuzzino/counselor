@@ -1,0 +1,12 @@
+## Interface: 16001
+## Title: Counselor
+## Notes: Gestore gilda & personaggio — The Faceless Council (Jeeves for Guilds)
+## Author: Stefano Scaramuzzino
+## Version: 0.4.0
+## SavedVariables: CounselorDB, CounselorSnapshot
+## X-Website: https://wow.jeevesaicloud.com
+## X-Curse-Project-ID: 1788340
+## X-Category: Guild
+## X-License: MIT
+
+Counselor.lua

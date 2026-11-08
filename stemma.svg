@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="260" viewBox="0 0 240 260" aria-hidden="true">
+<defs>
+<linearGradient id="blade5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBF0D0"></stop><stop offset="0.45" stop-color="#C9A56A"></stop><stop offset="0.55" stop-color="#6E4B22"></stop><stop offset="1" stop-color="#E8CB8A"></stop></linearGradient>
+<linearGradient id="gold5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9AE"></stop><stop offset="0.5" stop-color="#B9832F"></stop><stop offset="1" stop-color="#FFE0A0"></stop></linearGradient>
+<radialGradient id="ring5" cx="0.5" cy="0.4" r="0.6"><stop offset="0" stop-color="#5E1A10"></stop><stop offset="1" stop-color="#1C0605"></stop></radialGradient>
+<linearGradient id="hood5" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F6EEDF"></stop><stop offset="0.55" stop-color="#E2D5BC"></stop><stop offset="1" stop-color="#A8977A"></stop></linearGradient>
+<radialGradient id="void5" cx="0.5" cy="0.45" r="0.55"><stop offset="0" stop-color="#000000"></stop><stop offset="0.8" stop-color="#140806"></stop><stop offset="1" stop-color="#3A2418"></stop></radialGradient>
+<linearGradient id="ribbon5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8321E"></stop><stop offset="1" stop-color="#5E120A"></stop></linearGradient>
+<filter id="glow5" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.5"></feGaussianBlur></filter>
+</defs>
+<g stroke-linecap="round">
+<line x1="30" y1="232" x2="206" y2="30" stroke="#1A0A06" stroke-width="12"></line>
+<line x1="210" y1="232" x2="34" y2="30" stroke="#1A0A06" stroke-width="12"></line>
+<line x1="30" y1="232" x2="206" y2="30" stroke="#6B4A2E" stroke-width="8"></line>
+<line x1="210" y1="232" x2="34" y2="30" stroke="#6B4A2E" stroke-width="8"></line>
+</g>
+<path d="M2 6 Q60 8 76 64 L66 70 Q56 50 40 44 L50 80 Q38 44 1 36 Z" fill="url(#blade5)" stroke="#1A0A06" stroke-width="2.5" stroke-linejoin="round"></path>
+<path d="M238 6 Q180 8 164 64 L174 70 Q184 50 200 44 L190 80 Q202 44 239 36 Z" fill="url(#blade5)" stroke="#1A0A06" stroke-width="2.5" stroke-linejoin="round"></path>
+<circle cx="120" cy="124" r="94" fill="url(#ring5)" stroke="#1A0A06" stroke-width="8"></circle>
+<circle cx="120" cy="124" r="94" fill="none" stroke="url(#gold5)" stroke-width="5"></circle>
+<circle cx="120" cy="124" r="86" fill="none" stroke="url(#gold5)" stroke-width="4" stroke-dasharray="2 7" opacity="0.8"></circle>
+<circle cx="120" cy="124" r="80" fill="none" stroke="url(#gold5)" stroke-width="1.2" opacity="0.7"></circle>
+<g fill="url(#gold5)" stroke="#1A0A06" stroke-width="1">
+<circle cx="120" cy="30" r="4"></circle>
+<circle cx="26" cy="124" r="4"></circle>
+<circle cx="214" cy="124" r="4"></circle>
+</g>
+<path d="M120 42 C96 52 66 80 64 120 C62 152 70 174 54 198 C82 210 158 210 186 198 C170 174 178 152 176 120 C174 80 144 52 120 42 Z" fill="url(#hood5)" stroke="#2A1407" stroke-width="2"></path>
+<path d="M120 42 C110 70 104 100 108 150 M86 88 C80 120 82 160 74 196 M154 88 C160 120 158 160 166 196" fill="none" stroke="#8C7A5E" stroke-width="1.5" opacity="0.7"></path>
+<path d="M120 68 C99 68 86 92 86 118 C86 146 100 168 120 168 C140 168 154 146 154 118 C154 92 141 68 120 68 Z" fill="#CDBFA6" stroke="#2A1407" stroke-width="1.5"></path>
+<path d="M120 74 C102 74 92 96 92 118 C92 142 104 162 120 162 C136 162 148 142 148 118 C148 96 138 74 120 74 Z" fill="url(#void5)"></path>
+<g class="eyes"><g fill="#FF9A3C">
+<ellipse cx="108" cy="116" rx="8" ry="3.4" filter="url(#glow5)"></ellipse>
+<ellipse cx="132" cy="116" rx="8" ry="3.4" filter="url(#glow5)"></ellipse>
+</g>
+<g fill="#FFE2A8">
+<ellipse cx="108" cy="116" rx="4" ry="1.5"></ellipse>
+<ellipse cx="132" cy="116" rx="4" ry="1.5"></ellipse>
+</g></g>
+<path d="M30 212 L14 214 L22 226 L14 240 L40 238 Z" fill="#4A0E08" stroke="#1A0A06" stroke-width="1.5" stroke-linejoin="round"></path>
+<path d="M210 212 L226 214 L218 226 L226 240 L200 238 Z" fill="#4A0E08" stroke="#1A0A06" stroke-width="1.5" stroke-linejoin="round"></path>
+<path d="M34 204 Q120 196 206 204 L206 236 Q120 228 34 236 Z" fill="url(#ribbon5)" stroke="#E3B062" stroke-width="1.5"></path>
+<text x="120" y="226" text-anchor="middle" font-family="Cinzel, serif" font-weight="700" font-size="17" letter-spacing="7" fill="#FFE9AE" stroke="#2A0806" stroke-width="0.6">MMVI</text>
+</svg>

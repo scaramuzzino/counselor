@@ -1,0 +1,29 @@
+# Artefatti di build
+dist/
+build/
+*.app/
+*.dmg
+*.exe
+Output/
+__pycache__/
+*.pyc
+
+# Dati runtime del companion (mai versionati)
+config.json
+state.json
+companion.log
+companion.lock
+
+# Segreti / certificati (mai, in nessun caso)
+.env
+*.env
+*.pfx
+*.p12
+*.key
+ssh/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
