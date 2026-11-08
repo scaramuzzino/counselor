@@ -499,25 +499,83 @@ end
 
 local ROLE_LABEL = { TANK = "Tank", HEALER = "Healer", HEAL = "Healer", DAMAGER = "DPS", DPS = "DPS" }
 
+-- normalizza il ruolo del membro a una delle 3 chiavi-pacchetto (o nil se sconosciuto)
+local function roleKey(role)
+  local u = tostring(role or ""):upper():gsub("%s+", "")
+  if u == "TANK" then return "TANK"
+  elseif u == "HEALER" or u == "HEAL" then return "HEALER"
+  elseif u == "DAMAGER" or u == "DPS" or u == "DD" then return "DPS" end
+  return nil
+end
+
 local function buildRaid(snap)
   local rc = snap.raid_comp
-  if type(rc) ~= "table" or type(rc.members) ~= "table" or #rc.members == 0 then
+  local rt = snap.raid_tactics
+  local hasComp = type(rc) == "table" and type(rc.members) == "table" and #rc.members > 0
+  local hasTac  = type(rt) == "table" and type(rt.bosses) == "table" and #rt.bosses > 0
+  if not hasComp and not hasTac then
     return "|cffffd100Composizione raid|r\n \nNessuna composizione: il capo la crea dal sito/Jeeves\ne appare qui al prossimo /reload."
   end
-  local size = rc.size and ("  (" .. fmtInt(rc.size) .. ")") or ""
-  local lines = { "|cffffd100" .. tostring(rc.title or "Composizione raid") .. "|r" .. size }
-  if rc.updated_at then lines[#lines + 1] = "|cff888888aggiornata " .. fmtTs(rc.updated_at) .. "|r" end
-  lines[#lines + 1] = " "
-  for i = 1, #rc.members do
-    local m = rc.members[i] or {}
-    local hex  = classColorHex(m.cls)
-    local lvl  = m.level and ("  |cffaaaaaalv " .. fmtInt(m.level) .. "|r") or ""
-    local role = m.role and ("  |cffe8b85e· " .. (ROLE_LABEL[tostring(m.role):upper()] or tostring(m.role)) .. "|r") or ""
-    lines[#lines + 1] = string.format("|c%s%s|r%s%s", hex, tostring(m.name or "-"), lvl, role)
-    if m.note and tostring(m.note) ~= "" then
-      lines[#lines + 1] = "      |cffd8d2c6" .. tostring(m.note) .. "|r"
-    end
+  local lines = {}
+  if hasComp then
+    local size = rc.size and ("  (" .. fmtInt(rc.size) .. ")") or ""
+    lines[#lines + 1] = "|cffffd100" .. tostring(rc.title or "Composizione raid") .. "|r" .. size
+    if rc.updated_at then lines[#lines + 1] = "|cff888888aggiornata " .. fmtTs(rc.updated_at) .. "|r" end
     lines[#lines + 1] = " "
+    -- elenco completo + raccolta per pacchetto ruolo
+    local groups = { TANK = {}, HEALER = {}, DPS = {} }
+    for i = 1, #rc.members do
+      local m = rc.members[i] or {}
+      local hex  = classColorHex(m.cls)
+      local lvl  = m.level and ("  |cffaaaaaalv " .. fmtInt(m.level) .. "|r") or ""
+      local role = m.role and ("  |cffe8b85e· " .. (ROLE_LABEL[tostring(m.role):upper()] or tostring(m.role)) .. "|r") or ""
+      lines[#lines + 1] = string.format("|c%s%s|r%s%s", hex, tostring(m.name or "-"), lvl, role)
+      if m.note and tostring(m.note) ~= "" then
+        lines[#lines + 1] = "      |cffd8d2c6" .. tostring(m.note) .. "|r"
+      end
+      lines[#lines + 1] = " "
+      local rk = roleKey(m.role)
+      if rk then groups[rk][#groups[rk] + 1] = m end
+    end
+    -- pacchetti ruolo (TANK / HEALER / DPS)
+    lines[#lines + 1] = "|cffffd100Pacchetti ruolo|r"
+    lines[#lines + 1] = " "
+    local order = { { "TANK", "Tank" }, { "HEALER", "Healer" }, { "DPS", "DPS" } }
+    for _, o in ipairs(order) do
+      local g = groups[o[1]]
+      lines[#lines + 1] = string.format("|cffe8b85e%s|r  |cff888888(%d)|r", o[2], #g)
+      if #g == 0 then
+        lines[#lines + 1] = "      |cff666666nessuno|r"
+      else
+        for _, m in ipairs(g) do
+          local hex = classColorHex(m.cls)
+          local lvl = m.level and ("  |cffaaaaaalv " .. fmtInt(m.level) .. "|r") or ""
+          lines[#lines + 1] = string.format("      |c%s%s|r%s", hex, tostring(m.name or "-"), lvl)
+        end
+      end
+      lines[#lines + 1] = " "
+    end
+  end
+  -- tattiche in gioco (lettura per TUTTI i gildani)
+  if hasTac then
+    lines[#lines + 1] = "|cffffd100Tattiche" .. (rt.raid and ("  —  " .. tostring(rt.raid)) or "") .. "|r"
+    lines[#lines + 1] = " "
+    for _, boss in ipairs(rt.bosses) do
+      lines[#lines + 1] = "|cffe8b85e" .. tostring(boss.name or "Boss") .. "|r"
+      if boss.summary and tostring(boss.summary) ~= "" then
+        lines[#lines + 1] = "      |cffd8d2c6" .. tostring(boss.summary) .. "|r"
+      end
+      if boss.tank and tostring(boss.tank) ~= "" then
+        lines[#lines + 1] = "      |cff8fcaffTank:|r |cffd8d2c6" .. tostring(boss.tank) .. "|r"
+      end
+      if boss.healer and tostring(boss.healer) ~= "" then
+        lines[#lines + 1] = "      |cff66e089Healer:|r |cffd8d2c6" .. tostring(boss.healer) .. "|r"
+      end
+      if boss.dps and tostring(boss.dps) ~= "" then
+        lines[#lines + 1] = "      |cffff9a66DPS:|r |cffd8d2c6" .. tostring(boss.dps) .. "|r"
+      end
+      lines[#lines + 1] = " "
+    end
   end
   return table.concat(lines, "\n")
 end
@@ -743,12 +801,111 @@ local function renderBody(body)
   scontent:SetHeight(math.max(10, -y + 8))
 end
 
+-- ===== TATTICHE RAID: pulsanti di invio in chat (solo capo raid) =====
+-- Le tattiche (raid_tactics) arrivano dallo snapshot del SITO: NON sono valori secret,
+-- si possono concatenare/mostrare/mandare in chat liberamente.
+-- Spezza il testo in piu' messaggi <= 255 caratteri (taglio all'ultimo spazio quando possibile),
+-- anteponendo a OGNI riga il prefisso tipo "[<Boss> · TANK] ".
+local function chatChunks(prefix, text, maxlen)
+  maxlen = maxlen or 255
+  prefix = tostring(prefix or "")
+  text = tostring(text or ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+  local chunks = {}
+  if text == "" then return chunks end
+  local budget = maxlen - #prefix
+  if budget < 16 then budget = maxlen end            -- prefisso troppo lungo: non sforare comunque
+  while #text > 0 do
+    if #text <= budget then
+      chunks[#chunks + 1] = prefix .. text
+      break
+    end
+    local cut = text:sub(1, budget)
+    local sp  = cut:match("^.*()%s")                 -- posizione dell'ultimo spazio entro budget
+    local idx = (sp and sp > 1) and (sp - 1) or budget
+    chunks[#chunks + 1] = prefix .. text:sub(1, idx)
+    text = text:sub(idx + 1):gsub("^%s+", "")
+  end
+  return chunks
+end
+
+local function sendTactic(prefix, text, channel)
+  for _, line in ipairs(chatChunks(prefix, text, 255)) do
+    SendChatMessage(line, channel or "RAID")
+  end
+end
+
+-- pool di FontString (etichette) e Button (invio) dentro lo scroll content
+local raidLblPool, raidBtnPool = {}, {}
+local function acqRaidLbl(i)
+  local f = raidLblPool[i]
+  if not f then
+    f = scontent:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    f:SetWidth(ROW_W - 16); f:SetJustifyH("LEFT")
+    raidLblPool[i] = f
+  end
+  return f
+end
+local function acqRaidBtn(i)
+  local b = raidBtnPool[i]
+  if not b then
+    b = CreateFrame("Button", nil, scontent, "UIPanelButtonTemplate")
+    b:SetSize(134, 20)
+    raidBtnPool[i] = b
+  end
+  return b
+end
+local function hideRaidLeader()
+  for _, f in ipairs(raidLblPool) do f:Hide() end
+  for _, b in ipairs(raidBtnPool) do b:Hide() end
+end
+
+-- Dispone (sotto al testo gia' disegnato) i pulsanti di invio: solo se sei CAPO RAID.
+-- Per ogni boss: "Avviso raid" (summary -> RAID_WARNING) + "Invia ai Tank/Healer/DPS" (-> RAID).
+local function layoutRaidLeader(snap)
+  hideRaidLeader()
+  if not (IsInRaid() and UnitIsGroupLeader("player")) then return end
+  local rt = snap and snap.raid_tactics
+  if type(rt) ~= "table" or type(rt.bosses) ~= "table" or #rt.bosses == 0 then return end
+  local y  = -(scontent:GetHeight()) - 10
+  local li, bi = 0, 0
+  li = li + 1; local hdr = acqRaidLbl(li)
+  hdr:ClearAllPoints(); hdr:SetPoint("TOPLEFT", scontent, "TOPLEFT", 8, y)
+  hdr:SetText("|cffffd100Invio tattiche in chat (capo raid)|r"); hdr:Show(); y = y - 20
+  for _, boss in ipairs(rt.bosses) do
+    local name = tostring(boss.name or "Boss")
+    li = li + 1; local bl = acqRaidLbl(li)
+    bl:ClearAllPoints(); bl:SetPoint("TOPLEFT", scontent, "TOPLEFT", 8, y)
+    bl:SetText("|cffe8b85e" .. name .. "|r"); bl:Show(); y = y - 18
+    local defs = {
+      { lbl = "Avviso raid",    ch = "RAID_WARNING", pre = "[" .. name .. "] ",         txt = boss.summary },
+      { lbl = "Invia ai Tank",  ch = "RAID",         pre = "[" .. name .. " · TANK] ",   txt = boss.tank },
+      { lbl = "Invia ai Healer",ch = "RAID",         pre = "[" .. name .. " · HEALER] ", txt = boss.healer },
+      { lbl = "Invia ai DPS",   ch = "RAID",         pre = "[" .. name .. " · DPS] ",    txt = boss.dps },
+    }
+    local x = 8
+    for col, d in ipairs(defs) do
+      bi = bi + 1; local b = acqRaidBtn(bi)
+      b:ClearAllPoints(); b:SetPoint("TOPLEFT", scontent, "TOPLEFT", x, y)
+      b:SetText(d.lbl)
+      local pre, txt, ch = d.pre, d.txt, d.ch
+      b:SetScript("OnClick", function() sendTactic(pre, txt, ch) end)
+      if txt and tostring(txt) ~= "" then b:Enable() else b:Disable() end
+      b:Show()
+      if col % 2 == 0 then x = 8; y = y - 24 else x = 8 + 142 end
+    end
+    y = y - 8
+  end
+  local newH = -y + 8
+  if newH > scontent:GetHeight() then scontent:SetHeight(newH) end
+end
+
 local function renderStats(tab)
   local t = STATS_TABS[tab] or STATS_TABS[1]
   statsTitle:SetText(t.label)
   local snap = curSnap()
   -- le schede 'live' (Cruscotto col roster di gioco) si disegnano anche senza snapshot del sito
   if t.live or type(snap) == "table" then renderBody(t.build(snap)) else renderBody(NO_DATA) end
+  if t.key == "raid" then layoutRaidLeader(snap) else hideRaidLeader() end
   ssf:SetVerticalScroll(0)
 end
 
